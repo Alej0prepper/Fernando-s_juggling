@@ -2,6 +2,7 @@ import pygame
 import sys
 import math
 import json
+from siteswap_parser import Siteswap
 
 # Initialize Pygame
 pygame.init()
@@ -31,19 +32,49 @@ ball_radius = 20
 ball_speed = 0.05  # Speed of angle change
 gravity = 0.3  # Gravity for parabolic motion
 
+# Font for rendering text
+font = pygame.font.Font(None, 32)
+
+# Text input box
+input_box = pygame.Rect(100, 50, 140, 32)
+color_inactive = pygame.Color('lightskyblue3')
+color_active = pygame.Color('dodgerblue2')
+color = color_inactive
+active = False
+text = ''
+
 # Ball properties
-balls = [
-    {
-        "color": colors[i],
-        "x": left_hand_x if i % 2 == 0 else right_hand_x,
-        "y": hand_y,
-        "vx": 0, "vy": 0, "throw_time": 0,
-        "throw_angle": movements[2]["throw_angle"],
-        "throw_speed": movements[2]["throw_speed"],
-        "start_delay": i * 80,  # Add delay for each ball
-        "in_left_hand": i % 2 == 0  # Start in the left hand if index is even, otherwise in right hand
-    } for i in range(3)
-]
+balls = []
+
+def update_balls(siteswap_string):
+    global balls
+    ss = Siteswap(siteswap_string)
+    info = ss.get_info()
+    if not info["isValid"]:
+        print(f"Invalid siteswap: {info['error']}")
+        return
+
+    num_balls = info["numBalls"]
+    sequence = info["sequence"]
+    
+    balls = [
+        {
+            "color": colors[i % len(colors)],
+            "x": left_hand_x if i % 2 == 0 else right_hand_x,
+            "y": hand_y,
+            "vx": 0, "vy": 0,
+            "start_delay": i * 220,  # Add delay for each ball
+            "in_left_hand": i % 2 == 0,  # Start in the left hand if index is even, otherwise in right hand
+            "movements": [movements[s - 1] for s in sequence if s - 1 < len(movements)],  # Adjust for 0-index
+            "current_movement": 0,  # Index of the current movement
+            "throw_time": 0,  # Time when the ball should be thrown next
+        } for i in range(num_balls)
+    ]
+
+def movement_index(movement):
+    for i, move in enumerate(movements):
+        if move == movement:
+            return i
 
 # Main loop
 clock = pygame.time.Clock()
@@ -53,15 +84,44 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if input_box.collidepoint(event.pos):
+                # Toggle the active variable.
+                active = not active
+            else:
+                active = False
+            # Change the current color of the input box.
+            color = color_active if active else color_inactive
+        if event.type == pygame.KEYDOWN:
+            if active:
+                if event.key == pygame.K_RETURN:
+                    update_balls(text)
+                    text = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    text = text[:-1]
+                else:
+                    text += event.unicode
 
     # Clear the screen
     screen.fill(WHITE)
+
+    # Render the current text.
+    txt_surface = font.render(text, True, color)
+    # Resize the box if the text is too long.
+    width = max(200, txt_surface.get_width() + 10)
+    input_box.w = width
+    # Blit the text.
+    screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+    # Blit the input_box rect.
+    pygame.draw.rect(screen, color, input_box, 2)
 
     # Update and draw the balls
     for ball in balls:
         # Check if it's time to throw the ball
         elapsed_time = time - ball['start_delay']
         if elapsed_time >= 0:
+            current_movement = ball['movements'][ball['current_movement']]
             if elapsed_time >= ball['throw_time']:
                 # Update ball position
                 ball['x'] += ball['vx']
@@ -72,26 +132,31 @@ while running:
                 if ball['y'] >= hand_y:
                     ball['y'] = hand_y
                     ball['vy'] = 0
-                    ball['throw_time'] += 200  # Schedule next throw
+                    ball['throw_time'] += 100  # Schedule next throw
 
-                    # Swap hands for the next throw
-                    ball['in_left_hand'] = not ball['in_left_hand']
+                    # Swap hands for the next throw if the next movement index is even
+                    if movement_index(ball['movements'][ball['current_movement']]) % 2 == 0:
+                        ball['in_left_hand'] = not ball['in_left_hand']
+                    
+                    # Move to the next movement
+                    ball['current_movement'] = (ball['current_movement'] + 1) % len(ball['movements'])
+                    next_movement = ball['movements'][ball['current_movement']]
 
                     # Update vx based on the new hand position
-                    angle_radians = math.radians(ball["throw_angle"])
+                    angle_radians = math.radians(next_movement["throw_angle"])
                     if ball['in_left_hand']:
-                        ball['vx'] = ball["throw_speed"] * math.cos(angle_radians)
+                        ball['vx'] = next_movement["throw_speed"] * math.cos(angle_radians)
                     else:
-                        ball['vx'] = -ball["throw_speed"] * math.cos(angle_radians)
+                        ball['vx'] = -next_movement["throw_speed"] * math.cos(angle_radians)
 
                 # If the ball is in the hands, prepare to throw
                 if ball['vy'] == 0 and ball['y'] == hand_y:
-                    angle_radians = math.radians(ball["throw_angle"])
+                    angle_radians = math.radians(current_movement["throw_angle"])
                     if ball['in_left_hand']:
-                        ball['vx'] = -ball["throw_speed"] * math.cos(angle_radians)
+                        ball['vx'] = -current_movement["throw_speed"] * math.cos(angle_radians)
                     else:
-                        ball['vx'] = ball["throw_speed"] * math.cos(angle_radians)
-                    ball['vy'] = -ball["throw_speed"] * math.sin(angle_radians)
+                        ball['vx'] = current_movement["throw_speed"] * math.cos(angle_radians)
+                    ball['vy'] = -current_movement["throw_speed"] * math.sin(angle_radians)
 
         pygame.draw.circle(screen, ball['color'], (int(ball['x']), int(ball['y'])), ball_radius)
 
@@ -99,7 +164,7 @@ while running:
     pygame.display.flip()
 
     # Cap the frame rate
-    clock.tick(60)
+    clock.tick(50)
     time += ball_speed * 60  # Update global time
 
 pygame.quit()

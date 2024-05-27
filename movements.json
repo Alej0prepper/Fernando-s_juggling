@@ -1,56 +1,65 @@
 [
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
-        "throw_speed": 13,
-        "throw_angle": 10
+        "ball_speed": 0.05,
+        "throw_speed": 14.51,
+        "throw_angle": 10,
+        "move_to_opposite_hand": true
     },
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
+        "ball_speed": 0.05,
         "throw_speed": 7,
-        "throw_angle": 88
+        "throw_angle": 90,
+        "move_to_opposite_hand": false
     },
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
-        "throw_speed": 9,
-        "throw_angle": 60
+        "ball_speed": 0.05,
+        "throw_speed": 9.12,
+        "throw_angle": 60,
+        "move_to_opposite_hand": true
     },
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
+        "ball_speed": 0.05,
         "throw_speed": 10,
-        "throw_angle": 89
+        "throw_angle": 90,
+        "move_to_opposite_hand": false
     },
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
-        "throw_speed": 11,
-        "throw_angle": 73
+        "ball_speed": 0.05,
+        "throw_speed": 11.35,
+        "throw_angle": 73,
+        "move_to_opposite_hand": true
     },
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
+        "ball_speed": 0.05,
         "throw_speed": 13,
-        "throw_angle": 89
+        "throw_angle": 90,
+        "move_to_opposite_hand": false
     },
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
-        "throw_speed": 12,
-        "throw_angle": 76
+        "ball_speed": 0.05,
+        "throw_speed": 12.39,
+        "throw_angle": 76,
+        "move_to_opposite_hand": true
     },
     {
         "ball_radius": 10,
-        "ball_speed": 0.05,  
+        "ball_speed": 0.05,
         "throw_speed": 15,
-        "throw_angle": 89
+        "throw_angle": 90,
+        "move_to_opposite_hand": false
     },
     {
         "ball_radius": 20,
-        "ball_speed": 0.05,  
-        "throw_speed": 14,
-        "throw_angle": 80
+        "ball_speed": 0.05,
+        "throw_speed": 14.51,
+        "throw_angle": 80,
+        "move_to_opposite_hand": true
     }
 ]

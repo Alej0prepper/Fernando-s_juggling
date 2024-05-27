@@ -47,29 +47,30 @@ text = ''
 balls = []
 
 def update_balls(siteswap_string):
-    global balls
+    global balls, time
     ss = Siteswap(siteswap_string)
     info = ss.get_info()
     if not info["isValid"]:
         print(f"Invalid siteswap: {info['error']}")
         return
 
-    num_balls = info["numBalls"]
+    num_balls = int(info["numBalls"])
     sequence = info["sequence"]
-    
+
     balls = [
         {
             "color": colors[i % len(colors)],
             "x": left_hand_x if i % 2 == 0 else right_hand_x,
             "y": hand_y,
             "vx": 0, "vy": 0,
-            "start_delay": i * 120,  # Add delay for each ball
+            "start_delay": i * 50,  # Add delay for each ball
             "in_left_hand": i % 2 == 0,  # Start in the left hand if index is even, otherwise in right hand
             "movements": [movements[s - 1] for s in sequence if s - 1 < len(movements)],  # Adjust for 0-index
             "current_movement": 0,  # Index of the current movement
             "throw_time": 0,  # Time when the ball should be thrown next
         } for i in range(num_balls)
     ]
+    time = 0  # Reset the global time
 
 def movement_index(movement):
     for i, move in enumerate(movements):

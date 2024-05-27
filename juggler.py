@@ -63,7 +63,7 @@ def update_balls(siteswap_string):
             "x": left_hand_x if i % 2 == 0 else right_hand_x,
             "y": hand_y,
             "vx": 0, "vy": 0,
-            "start_delay": i * 220,  # Add delay for each ball
+            "start_delay": i * 120,  # Add delay for each ball
             "in_left_hand": i % 2 == 0,  # Start in the left hand if index is even, otherwise in right hand
             "movements": [movements[s - 1] for s in sequence if s - 1 < len(movements)],  # Adjust for 0-index
             "current_movement": 0,  # Index of the current movement

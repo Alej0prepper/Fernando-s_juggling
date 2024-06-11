@@ -2,7 +2,8 @@ import pygame
 import sys
 import math
 import json
-from siteswap_learn import generate_siteswap_sequence  # Import the function from the helper file
+from siteswap_parser import Siteswap
+from learning_logic import generate_siteswap_sequence  # Import the function from the helper file
 
 # Initialize Pygame
 pygame.init()
@@ -51,9 +52,19 @@ balls = []
 # List of siteswaps to display
 siteswap_sequence = []
 current_index = 0
+at_end = False  # Flag to track if we are at the end of the sequence
 
-def update_balls(sequence):
+def update_balls(siteswap_string):
     global balls, time
+    ss = Siteswap(siteswap_string)
+    info = ss.get_info()
+    if not info["isValid"]:
+        print(f"Invalid siteswap: {info['error']}")
+        return
+
+    num_balls = int(info["numBalls"])
+    sequence = info["sequence"]
+
     balls = [
         {
             "color": colors[i % len(colors)],
@@ -74,6 +85,14 @@ def movement_index(movement):
         if move == movement:
             return i
 
+def reset_app_state():
+    global balls, siteswap_sequence, current_index, at_end, text
+    balls = []
+    siteswap_sequence = []
+    current_index = 0
+    at_end = False
+    text = ''
+
 # Main loop
 clock = pygame.time.Clock()
 time = 0  # Global time to manage throws
@@ -91,13 +110,18 @@ while running:
             if learn_button.collidepoint(event.pos):
                 siteswap_sequence = generate_siteswap_sequence(text)
                 current_index = 0
+                at_end = False
                 if siteswap_sequence:
                     update_balls(siteswap_sequence[current_index])
                 text = ''
 
             if next_button.collidepoint(event.pos):
-                if siteswap_sequence:
+                if at_end:
+                    reset_app_state()
+                elif siteswap_sequence:
                     current_index = (current_index + 1) % len(siteswap_sequence)
+                    if current_index == len(siteswap_sequence) - 1:
+                        at_end = True
                     update_balls(siteswap_sequence[current_index])
 
             color = color_active if active else color_inactive
@@ -107,6 +131,7 @@ while running:
                 if event.key == pygame.K_RETURN:
                     siteswap_sequence = generate_siteswap_sequence(text)
                     current_index = 0
+                    at_end = False
                     if siteswap_sequence:
                         update_balls(siteswap_sequence[current_index])
                     text = ''
@@ -133,9 +158,9 @@ while running:
     learn_button_text = font.render("Learn", True, BLACK)
     screen.blit(learn_button_text, (learn_button.x + 20, learn_button.y + 5))
 
-    # Draw the next button
+    # Draw the next/end button
     pygame.draw.rect(screen, pygame.Color('lightskyblue3'), next_button)
-    next_button_text = font.render("Next", True, BLACK)
+    next_button_text = font.render("End" if at_end else "Next", True, BLACK)
     screen.blit(next_button_text, (next_button.x + 20, next_button.y + 5))
 
     # Update and draw the balls

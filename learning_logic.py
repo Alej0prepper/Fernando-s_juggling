@@ -49,17 +49,17 @@ def todos_impares(lista):
     # Si hemos llegado aquí, todos los números son impares
     return True
 # Analizar el siteswap
-def genera_secuencia_siteswaps(siteswap):
+def generate_siteswap_sequence(siteswap):
         if(todos_pares(siteswap)):
-            aux = [0,2,4,6,8]
+            aux = ['0','2','4','6','8']
         elif(todos_impares(siteswap)):
-            aux = [1,3,5,7,9]
-        else: aux = [0,1,2,3,4,5,6,7,8,9]
+            aux = ['1','3','5','7','9']
+        else: aux = ['0','2','4','6','8','1','3','5','7','9']
     #devuelve una lista de siteswaps pares de tamanno 1... len(siteswap) donde cada uno es subconjunto de siteswap
         exit = []
         if(len(siteswap)>1):
             for i in aux:
-                if(i <= encontrar_mayor_numero(siteswap)):
+                if(int(i) <= encontrar_mayor_numero(siteswap)):
                     exit.append(i)
         for i in range(len(siteswap)-2):
             end = False
@@ -71,12 +71,12 @@ def genera_secuencia_siteswaps(siteswap):
         return exit
 ##
 
-print(encontrar_mayor_numero('12343294842356'))
-print(genera_secuencia_siteswaps('2422'))
-print(genera_secuencia_siteswaps('1379555'))
-print(genera_secuencia_siteswaps('12425'))
+# print(encontrar_mayor_numero('12343294842356'))
+# print(generate_siteswap_sequence('2422'))
+# print(generate_siteswap_sequence('1379555'))
+# print(generate_siteswap_sequence('12425'))
 
 #crea la funcion main
 #genera sevuencia de aprendizaje
 
-print(genera_secuencia_siteswaps('1379555'))
+# print(generate_siteswap_sequence('1379555'))

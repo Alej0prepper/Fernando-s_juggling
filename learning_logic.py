@@ -1,52 +1,54 @@
 import random
 import re 
 
-def subconjunto_aleatorio(cadena, k):
-    caracteres = list(cadena)
-    random.shuffle(caracteres)
-    subconjunto = caracteres[:k]
-    return ''.join(subconjunto)
+def random_subset(string, k):
+    characters = list(string)
+    random.shuffle(characters)
+    subset = characters[:k]
+    return ''.join(subset)
 
-def es_siteswap_valido(siteswap):
-    digitos = [int(digito) for digito in siteswap]
-    suma_digitos = sum(digitos)
-    longitud_siteswap = len(digitos)
-    return suma_digitos % longitud_siteswap == 0
+def is_siteswap_valid(siteswap):
+    digits = [int(digit) for digit in siteswap]
+    sum_digits = sum(digits)
+    length_siteswap = len(digits)
+    return sum_digits % length_siteswap == 0
 
-def encontrar_mayor_numero(cadena):
-    numeros = [i for i in cadena]
-    numeros_enteros = [int(numero) for numero in numeros]
-    return max(numeros_enteros) if numeros_enteros else None
+def find_largest_number(string):
+    numbers = [i for i in string]
+    integers = [int(number) for number in numbers]
+    return max(integers) if integers else None
 
-def todos_pares(lista):
-    for num in lista:
+def all_even(numbers_list):
+    for num in numbers_list:
         if int(num) % 2!= 0:
             return False
     return True
 
-def todos_impares(lista):
-    for num in lista:
+def all_odd(numbers_list):
+    for num in numbers_list:
         if int(num) % 2 == 0:
             return False
     return True
 
-def genera_secuencia_siteswaps(siteswap):
-    if(todos_pares(siteswap)):
+def generate_siteswap_sequence(siteswap):
+    if(all_even(siteswap)):
         aux = [0,2,4,6,8]
-    elif(todos_impares(siteswap)):
+    elif(all_odd(siteswap)):
         aux = [1,3,5,7,9]
     else: aux = [0,1,2,3,4,5,6,7,8,9]
-    exit = []
-    if(len(siteswap)>1):
+    result = []
+    if(len(siteswap) > 1):
         for i in aux:
-            if(i <= encontrar_mayor_numero(siteswap)):
-                exit.append(i)
+            if(i <= find_largest_number(siteswap)):
+                result.append(i)
     for i in range(len(siteswap)-2):
-        end = False
-        while(not end):
-            aux = subconjunto_aleatorio(siteswap,i+2)
-            if(es_siteswap_valido(aux)):
-                end = True
-        exit.append(aux)
-    exit.append(siteswap)
-    return exit
+        done = False
+        while(not done):
+            aux = random_subset(siteswap,i+2)
+            if(is_siteswap_valid(aux)):
+                done = True
+        result.append(aux)
+    result.append(siteswap)
+    return result
+
+print(generate_siteswap_sequence('123422'))

@@ -62,5 +62,3 @@ for item in tokens:
     except ValueError:
         pass  # Ignora el error y continúa con el siguiente elemento
 print(final)
-
-

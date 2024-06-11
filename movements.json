@@ -2,8 +2,8 @@
     {
         "ball_radius": 20,
         "ball_speed": 0.05,
-        "throw_speed": 14.51,
-        "throw_angle": 10,
+        "throw_speed": 14.5,
+        "throw_angle": 9.3,
         "move_to_opposite_hand": true
     },
     {
@@ -16,7 +16,7 @@
     {
         "ball_radius": 20,
         "ball_speed": 0.05,
-        "throw_speed": 9.12,
+        "throw_speed": 9.1,
         "throw_angle": 60,
         "move_to_opposite_hand": true
     },

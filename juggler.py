@@ -3,6 +3,7 @@ import sys
 import math
 import json
 from siteswap_parser import Siteswap
+from learning_logic import generate_siteswap_sequence  # Import the function from the helper file
 
 # Initialize Pygame
 pygame.init()
@@ -37,6 +38,8 @@ font = pygame.font.Font(None, 32)
 
 # Text input box
 input_box = pygame.Rect(100, 50, 140, 32)
+learn_button = pygame.Rect(250, 50, 100, 32)
+next_button = pygame.Rect(370, 50, 100, 32)
 color_inactive = pygame.Color('lightskyblue3')
 color_active = pygame.Color('dodgerblue2')
 color = color_inactive
@@ -45,6 +48,11 @@ text = ''
 
 # Ball properties
 balls = []
+
+# List of siteswaps to display
+siteswap_sequence = []
+current_index = 0
+at_end = False  # Flag to track if we are at the end of the sequence
 
 def update_balls(siteswap_string):
     global balls, time
@@ -68,7 +76,7 @@ def update_balls(siteswap_string):
             "movements": [movements[s - 1] for s in sequence if s - 1 < len(movements)],  # Adjust for 0-index
             "current_movement": 0,  # Index of the current movement
             "throw_time": 0,  # Time when the ball should be thrown next
-        } for i in range(num_balls)
+        } for i in range(len(sequence))
     ]
     time = 0  # Reset the global time
 
@@ -76,6 +84,14 @@ def movement_index(movement):
     for i, move in enumerate(movements):
         if move == movement:
             return i
+
+def reset_app_state():
+    global balls, siteswap_sequence, current_index, at_end, text
+    balls = []
+    siteswap_sequence = []
+    current_index = 0
+    at_end = False
+    text = ''
 
 # Main loop
 clock = pygame.time.Clock()
@@ -86,18 +102,38 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect.
             if input_box.collidepoint(event.pos):
-                # Toggle the active variable.
                 active = not active
             else:
                 active = False
-            # Change the current color of the input box.
+
+            if learn_button.collidepoint(event.pos):
+                siteswap_sequence = generate_siteswap_sequence(text)
+                current_index = 0
+                at_end = False
+                if siteswap_sequence:
+                    update_balls(siteswap_sequence[current_index])
+                text = ''
+
+            if next_button.collidepoint(event.pos):
+                if at_end:
+                    reset_app_state()
+                elif siteswap_sequence:
+                    current_index = (current_index + 1) % len(siteswap_sequence)
+                    if current_index == len(siteswap_sequence) - 1:
+                        at_end = True
+                    update_balls(siteswap_sequence[current_index])
+
             color = color_active if active else color_inactive
+
         if event.type == pygame.KEYDOWN:
             if active:
                 if event.key == pygame.K_RETURN:
-                    update_balls(text)
+                    siteswap_sequence = generate_siteswap_sequence(text)
+                    current_index = 0
+                    at_end = False
+                    if siteswap_sequence:
+                        update_balls(siteswap_sequence[current_index])
                     text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
@@ -117,40 +153,43 @@ while running:
     # Blit the input_box rect.
     pygame.draw.rect(screen, color, input_box, 2)
 
+    # Draw the learn button
+    pygame.draw.rect(screen, pygame.Color('lightskyblue3'), learn_button)
+    learn_button_text = font.render("Learn", True, BLACK)
+    screen.blit(learn_button_text, (learn_button.x + 20, learn_button.y + 5))
+
+    # Draw the next/end button
+    pygame.draw.rect(screen, pygame.Color('lightskyblue3'), next_button)
+    next_button_text = font.render("End" if at_end else "Next", True, BLACK)
+    screen.blit(next_button_text, (next_button.x + 20, next_button.y + 5))
+
     # Update and draw the balls
     for ball in balls:
-        # Check if it's time to throw the ball
         elapsed_time = time - ball['start_delay']
         if elapsed_time >= 0:
             current_movement = ball['movements'][ball['current_movement']]
             if elapsed_time >= ball['throw_time']:
-                # Update ball position
                 ball['x'] += ball['vx']
                 ball['y'] += ball['vy']
                 ball['vy'] += gravity
 
-                # Check if the ball is caught
                 if ball['y'] >= hand_y:
                     ball['y'] = hand_y
                     ball['vy'] = 0
-                    ball['throw_time'] += 100  # Schedule next throw
+                    ball['throw_time'] += 190
 
-                    # Swap hands for the next throw if the next movement index is even
                     if movement_index(ball['movements'][ball['current_movement']]) % 2 == 0:
                         ball['in_left_hand'] = not ball['in_left_hand']
-                    
-                    # Move to the next movement
+
                     ball['current_movement'] = (ball['current_movement'] + 1) % len(ball['movements'])
                     next_movement = ball['movements'][ball['current_movement']]
 
-                    # Update vx based on the new hand position
                     angle_radians = math.radians(next_movement["throw_angle"])
                     if ball['in_left_hand']:
                         ball['vx'] = next_movement["throw_speed"] * math.cos(angle_radians)
                     else:
                         ball['vx'] = -next_movement["throw_speed"] * math.cos(angle_radians)
 
-                # If the ball is in the hands, prepare to throw
                 if ball['vy'] == 0 and ball['y'] == hand_y:
                     angle_radians = math.radians(current_movement["throw_angle"])
                     if ball['in_left_hand']:
@@ -161,12 +200,10 @@ while running:
 
         pygame.draw.circle(screen, ball['color'], (int(ball['x']), int(ball['y'])), ball_radius)
 
-    # Update the display
     pygame.display.flip()
 
-    # Cap the frame rate
     clock.tick(50)
-    time += ball_speed * 60  # Update global time
+    time += ball_speed * 60
 
 pygame.quit()
 sys.exit()

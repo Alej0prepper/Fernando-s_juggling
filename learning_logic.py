@@ -32,14 +32,14 @@ def all_odd(numbers_list):
 
 def generate_siteswap_sequence(siteswap):
     if(all_even(siteswap)):
-        aux = [0,2,4,6,8]
+        aux = aux = ['0','2','4','6','8']
     elif(all_odd(siteswap)):
-        aux = [1,3,5,7,9]
-    else: aux = [0,1,2,3,4,5,6,7,8,9]
+        aux = aux = ['1','3','5','7','9']
+    else: aux = ['0','2','4','6','8','1','3','5','7','9']
     result = []
     if(len(siteswap) > 1):
         for i in aux:
-            if(i <= find_largest_number(siteswap)):
+            if(int(i) <= find_largest_number(siteswap)):
                 result.append(i)
     for i in range(len(siteswap)-2):
         done = False
@@ -49,4 +49,5 @@ def generate_siteswap_sequence(siteswap):
                 done = True
         result.append(aux)
     result.append(siteswap)
-    return list(set(result))
+    return result
+

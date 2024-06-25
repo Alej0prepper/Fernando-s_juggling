@@ -49,6 +49,4 @@ def generate_siteswap_sequence(siteswap):
                 done = True
         result.append(aux)
     result.append(siteswap)
-    return result
-
-print(generate_siteswap_sequence('123422'))
+    return list(set(result))

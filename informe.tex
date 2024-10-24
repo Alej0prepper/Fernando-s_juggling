@@ -1,0 +1,77 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{Informe sobre la Representación de los \emph{Siteswaps} mediante Grafos y su Reducción}
+\author{Alejandro Álvarez Lamazares, Frank Pérez Fleita,\\ Adrián Hernández Santos}
+\date{3er Año de Ciencia de la Computación}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este informe describe el proceso de representación de los *siteswaps* mediante grafos y cómo se obtiene un grafo más simple a partir de uno complejo. El uso de técnicas como la eliminación de estados transitorios, agrupación de configuraciones equivalentes y simplificación de transiciones permite reducir la complejidad de un grafo manteniendo la estructura esencial de los lanzamientos en malabarismo.
+\end{abstract}
+
+\section{Introducción}
+
+El malabarismo, además de ser una actividad física, puede ser modelado matemáticamente utilizando herramientas como los \emph{siteswaps}. Un \emph{siteswap} es una secuencia numérica que describe los lanzamientos y capturas de objetos, permitiendo modelar los movimientos de manera precisa. Esta secuencia se puede representar mediante grafos, donde los nodos representan los estados de los objetos en el aire y las aristas corresponden a los lanzamientos entre esos estados.
+
+La necesidad de reducir la complejidad de estos grafos surge cuando se busca optimizar el análisis o simplificar la visualización del comportamiento de un \emph{siteswap} complejo. En este informe, se explica el proceso de construcción y simplificación de un grafo derivado de un \emph{siteswap}, describiendo las técnicas utilizadas para obtener versiones más manejables del grafo original.
+
+\section{Representación de \emph{Siteswaps} mediante Grafos}
+
+Cada \emph{siteswap} puede representarse como un grafo dirigido, donde:
+
+\begin{itemize}
+    \item \textbf{Nodos:} Representan configuraciones de los objetos en el aire en un determinado instante de tiempo. Cada nodo se identifica por una secuencia binaria, donde "1" indica que un objeto está a punto de caer y "0" que no hay objetos en ese instante.
+    \item \textbf{Aristas:} Conectan dos nodos y representan un lanzamiento de un objeto desde un estado hacia otro. La altura del lanzamiento (especificada por el valor del \emph{siteswap}) determina el nodo de destino.
+\end{itemize}
+
+El grafo resultante muestra todas las posibles transiciones entre los estados del sistema a lo largo del tiempo, formando un ciclo cuando el \emph{siteswap} es repetitivo.
+
+\section{Ciclos y Simplicidad en los Grafos de \emph{Siteswaps}}
+
+Los grafos derivados de \emph{siteswaps} suelen contener ciclos que representan la periodicidad del movimiento de los malabares. Al identificar estos ciclos, se puede simplificar el análisis, ya que los ciclos capturan toda la información relevante sobre la secuencia de lanzamientos. Un \emph{siteswap} cíclico puede generar un grafo con nodos y transiciones que se repiten periódicamente, permitiendo reducir el análisis a un subconjunto de esos nodos.
+
+\section{Reducción del Grafo: Proceso y Técnicas}
+
+El proceso de obtención de un grafo más simple consiste en reducir gradualmente el tamaño del \emph{siteswap}. La idea es obtener grafos más pequeños en cada iteración, reduciendo el número de nodos y aristas, pero manteniendo la estructura clave del movimiento.
+
+\subsection{Construcción del Grafo Inicial}
+
+El primer paso es construir el grafo completo a partir del \emph{siteswap} original. Este grafo contiene todos los nodos y aristas que representan las configuraciones y lanzamientos posibles en el \emph{siteswap}. En esta fase, se genera el grafo correspondiente a la secuencia completa del \emph{siteswap}, con todos sus nodos y transiciones.
+
+\subsection{Reducción del Tamaño del \emph{Siteswap}}
+
+La clave para simplificar el grafo es reducir el tamaño del \emph{siteswap}. Esto se logra modificando la secuencia de lanzamientos para que contenga menos elementos, lo que automáticamente reduce el número de nodos y aristas en el grafo. En cada paso de la reducción, se obtiene un grafo más pequeño, pero que sigue capturando la esencia del ciclo de lanzamientos. 
+
+El código implementa esta reducción utilizando la función \texttt{decrease\_siteswap\_size}, que modifica la longitud del \emph{siteswap} eliminando ciertos elementos. A medida que el tamaño del \emph{siteswap} disminuye, el grafo se simplifica, pues contiene menos nodos que representan menos configuraciones posibles de los objetos.
+
+\subsection{Generación de Sub-Grafos Menores}
+
+Cada vez que el \emph{siteswap} se reduce, se genera un nuevo sub-grafo que es más pequeño que el grafo original. Este proceso es iterativo, es decir, con cada iteración se reduce el tamaño del \emph{siteswap}, y, por lo tanto, el grafo resultante es cada vez más simple. 
+
+El código implementa este proceso a través de la función \texttt{get\_subsiteswap\_list}, que realiza la reducción del \emph{siteswap} y genera los correspondientes sub-grafos. En cada iteración, se obtiene un grafo que tiene menos nodos y transiciones, hasta llegar a una versión mínima del \emph{siteswap}.
+
+\section{Ejemplo Paso a Paso del Proceso de Reducción}
+
+Supongamos que el \emph{siteswap} original es 534. El proceso de simplificación seguiría estos pasos:
+
+\begin{enumerate}
+    \item Se construye el grafo completo para el \emph{siteswap} 534, generando todos los nodos y aristas posibles.
+    \item Se detectan los ciclos dentro del grafo que representan las secuencias repetitivas de lanzamientos.
+    \item Se reduce el tamaño del \emph{siteswap} eliminando partes que no alteran el comportamiento esencial del ciclo.
+    \item Se generan sub-grafos más pequeños con cada reducción del \emph{siteswap}, hasta obtener una versión simplificada del grafo original.
+\end{enumerate}
+
+Este proceso permite pasar de un grafo complejo con múltiples nodos y transiciones a una versión más simple, sin perder información relevante sobre los lanzamientos.
+
+\section{Conclusión}
+
+El proceso de reducción de grafos a partir de \emph{siteswaps} permite simplificar el análisis de los movimientos de malabares. Utilizando técnicas como la eliminación de estados transitorios, la reducción del tamaño del \emph{siteswap} y la detección de ciclos, es posible generar versiones más simples de los grafos originales. Estos grafos simplificados son más fáciles de analizar y manipular, lo que facilita tanto el estudio matemático como la simulación de los movimientos.
+
+\end{document}
